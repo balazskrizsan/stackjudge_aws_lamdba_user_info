@@ -1,0 +1,11 @@
+Resources:
+  Function:
+    Type: AWS::Serverless::Function
+    Properties:
+      Timeout: 300
+      MemorySize: 128
+      Handler: org.kbalazsworks.app.App
+      CodeUri: W:\_stackjudge\aws_lambda\aws_lambda
+      Runtime: java17
+      Architectures:
+        - x86_64
