@@ -1,12 +1,18 @@
 package org.kbalazsworks.app;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 
 @Getter
-@RequiredArgsConstructor
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class RequestEntity
 {
-    private final String token;
+    private String idsUserId;
+    private String token;
 }
