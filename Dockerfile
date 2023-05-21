@@ -1,8 +1,14 @@
+FROM maven:3.8.3-openjdk-17 as build-step
+
+ARG CODEARTIFACT_AUTH_TOKEN=eyJ2ZXIiOjEsImlzdSI6MTY4NDY5NDk5MywiZW5jIjoiQTEyOEdDTSIsInRhZyI6Im1XRUFFUG1WQnE0UUJFY1luaVcyVHciLCJleHAiOjE2ODQ3MzgxOTMsImFsZyI6IkExMjhHQ01LVyIsIml2IjoiQnQyM0MtWDhQS2I2TWZKSSJ9._fVH_RnnTiLidIHV_Hdk_g.l_FPleuFpWKqocfw.ANiMepZuYIdIxs0iB1nwoZuqlaV_V3IvQNTT2viRC755rzqaVj5dy7mEwk8LFaJ5bylxXIVGZ4LlCAwLRwdIUAvjzsapfa-gymiP3QQn9SdYMm744zTA-1EdIfm97miaDQiVJgLrgbEC9BfYC__inGxqW1MNyyz04XxFlygF4LKPuZOcHsbGiGjKDjLY755jRX3N8o8NyNdfGJpdLXDFDG2hp3ENYP-ZzAwNTbA1K_-XaS1w0cRlTrE1jopGh1ppyGuvJBvPjHsEiXUTsQlNZSqCOLNqcSoTauJeZ5RUToj5MGmYjtZrHTGFmU81cAhs71dzKNpaT3rnNkXZIuaRGxWQtFmHBbEeFSPmbYflCd4WjDAlMH7-mK2RIpJ0eXQmAQPX-DPP-nH8NayrHZE2aEEuAV0NVTDzwOgrJV3699yjGyzxsiSrnjdDpKWb42BAJco2ZRNmn52xeODMZvO347qbj1OXGZv61a5bVYU0-dwb5yVMKDm-nJTODBr5MuuJ32ITMrx1OBp4LELg_YGQmlGo0mmNdOumapdyQgsfE6RBJWI2yzOLbQLr8SenPPpmVQBjckeRxsnoj0pI7Fuxc4nI3pet5tJpFO052j5AJ_Lvp89W9SRXnjZfEft6RnS9JM5RcDo3C4LceWPJPSSvcIQqUPCYW4Jg9I8nvYjvEGhCx9cOHPJnWipfUyMxFOoHr7HdYn5Ows-Tn0jQeD9WTusfBOCpZXv2a2PjSvzMxrB7ORKm-T1n0gEs_-GH0SshTo27fD__UJ7uzBHaqTgN1x2_qCHjfm0KkepfhQYfgq4Ovlt6i1tK7cXF6_iClICpB_0n80nO41Af2fhFaLgiOax6NTrP1IO0Ih8ELGDAcEt5MAQGc513Ifrb0B0cUlqEMAp1bmRhqjjii4KrHarKLGyRqEhgP3I65Yal7KyYdkHtyUqLJJrHNh0.t7RSPXBMnx8EGaemaouMlw
+
+COPY ./ /project
+
+RUN  cd /project && mvn -s /project/settings.xml compile dependency:copy-dependencies -DincludeScope=runtime
+
 FROM public.ecr.aws/lambda/java:11
 
-# Copy function code and runtime dependencies from Maven layout
-COPY target/classes ${LAMBDA_TASK_ROOT}
-COPY target/dependency/* ${LAMBDA_TASK_ROOT}/lib/
+COPY --from=build-step /project/target/classes ${LAMBDA_TASK_ROOT}
+COPY --from=build-step /project/target/dependency/* ${LAMBDA_TASK_ROOT}/lib/
 
-# Set the CMD to your handler (could also be done as a parameter override outside of the Dockerfile)
 CMD [ "org.kbalazsworks.app.App::handleRequest" ]
